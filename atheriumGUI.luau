@@ -15,23 +15,23 @@ pcall(function()
 	end
 end)
 
--- iOS 17 grouped / frosted Theme (Light)
+-- Atherium B/W monochrome (pleasant dark)
 local THEME = {
-	Background = Color3.fromRGB(242, 242, 247),
-	Header = Color3.fromRGB(255, 255, 255),
-	Card = Color3.fromRGB(255, 255, 255),
-	CardHover = Color3.fromRGB(229, 229, 234),
+	Background = Color3.fromRGB(14, 14, 16),
+	Header = Color3.fromRGB(20, 20, 23),
+	Card = Color3.fromRGB(24, 24, 27),
+	CardHover = Color3.fromRGB(32, 32, 36),
 
-	-- iOS system palette
-	Accent = Color3.fromRGB(0, 122, 255),        -- iOS Blue
-	Success = Color3.fromRGB(52, 199, 89),       -- iOS Green
-	Warning = Color3.fromRGB(255, 149, 0),       -- iOS Orange
-	Error = Color3.fromRGB(255, 59, 48),         -- iOS Red
+	-- monochrome accents (no neon)
+	Accent = Color3.fromRGB(245, 245, 247),      -- white
+	Success = Color3.fromRGB(245, 245, 247),
+	Warning = Color3.fromRGB(170, 170, 175),
+	Error = Color3.fromRGB(255, 105, 105),       -- muted, only for errors
 
-	Text = Color3.fromRGB(0, 0, 0),
-	SubText = Color3.fromRGB(142, 142, 147),
-	Border = Color3.fromRGB(229, 229, 234),
-	BorderFocus = Color3.fromRGB(0, 122, 255),
+	Text = Color3.fromRGB(245, 245, 247),
+	SubText = Color3.fromRGB(152, 152, 159),
+	Border = Color3.fromRGB(38, 38, 42),
+	BorderFocus = Color3.fromRGB(120, 120, 128),
 }
 
 local function addCorner(parent, radius)
@@ -112,42 +112,42 @@ function AtheriumGUI.CreateWindow(titleText)
 	notifLayout.Padding = UDim.new(0, 8)
 	notifLayout.Parent = notifHolder
 
-	-- Main Window Frame (iOS sheet)
+	-- Main Window Frame (B/W sheet)
 	local mainFrame = Instance.new("Frame")
 	mainFrame.Name = "MainFrame"
-	mainFrame.Size = UDim2.new(0, 520, 0, 420)
-	mainFrame.Position = UDim2.new(0.5, -260, 0.5, -210)
+	mainFrame.Size = UDim2.new(0, 480, 0, 380)
+	mainFrame.Position = UDim2.new(0.5, -240, 0.5, -190)
 	mainFrame.BackgroundColor3 = THEME.Background
 	mainFrame.BackgroundTransparency = self.GlobalTransparency
 	mainFrame.BorderSizePixel = 0
 	mainFrame.ClipsDescendants = true
 	mainFrame.Parent = screenGui
-	addCorner(mainFrame, 20)
+	addCorner(mainFrame, 12)
 	local mainStroke = addStroke(mainFrame, THEME.Border, 0)
 
 	table.insert(self.ElementsToTransparency, {Instance = mainFrame, BaseTransparency = 0})
 
-	-- Window Header (iOS nav bar, only top rounded)
+	-- Window Header (B/W bar, only top rounded)
 	local header = Instance.new("Frame")
 	header.Name = "Header"
-	header.Size = UDim2.new(1, 0, 0, 52)
+	header.Size = UDim2.new(1, 0, 0, 44)
 	header.BackgroundColor3 = THEME.Header
 	header.BackgroundTransparency = self.GlobalTransparency
 	header.BorderSizePixel = 0
 	header.Parent = mainFrame
-	addCorner(header, 20)
+	addCorner(header, 12)
 
 	-- cover bottom rounding so only top is rounded
 	local headerFix = Instance.new("Frame")
 	headerFix.Name = "HeaderFix"
-	headerFix.Size = UDim2.new(1, 0, 0, 20)
-	headerFix.Position = UDim2.new(0, 0, 1, -20)
+	headerFix.Size = UDim2.new(1, 0, 0, 12)
+	headerFix.Position = UDim2.new(0, 0, 1, -12)
 	headerFix.BackgroundColor3 = THEME.Header
 	headerFix.BackgroundTransparency = self.GlobalTransparency
 	headerFix.BorderSizePixel = 0
 	headerFix.Parent = header
 
-	-- iOS separator line under header
+	-- separator line under header
 	local headerLine = Instance.new("Frame")
 	headerLine.Name = "Separator"
 	headerLine.Size = UDim2.new(1, 0, 0, 1)
@@ -158,10 +158,10 @@ function AtheriumGUI.CreateWindow(titleText)
 
 	local title = Instance.new("TextLabel")
 	title.Size = UDim2.new(1, -120, 1, 0)
-	title.Position = UDim2.new(0, 20, 0, 0)
+	title.Position = UDim2.new(0, 14, 0, 0)
 	title.Text = titleText or "Atherium"
 	title.TextColor3 = THEME.Text
-	title.TextSize = 17
+	title.TextSize = 14
 	title.Font = Enum.Font.GothamBold
 	title.TextXAlignment = Enum.TextXAlignment.Left
 	title.BackgroundTransparency = 1
@@ -413,13 +413,13 @@ function AtheriumGUI:AddButton(text, iconName, callback)
 	end
 
 	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(1, 0, 0, 46)
+	button.Size = UDim2.new(1, 0, 0, 38)
 	button.BackgroundColor3 = THEME.Card
 	button.BackgroundTransparency = self.GlobalTransparency
 	button.Text = ""
 	button.AutoButtonColor = false
 	button.Parent = self.Container
-	addCorner(button, 14)
+	addCorner(button, 10)
 	local stroke = addStroke(button, THEME.Border, 0)
 
 	table.insert(self.ElementsToTransparency, {Instance = button, BaseTransparency = 0})
@@ -428,10 +428,10 @@ function AtheriumGUI:AddButton(text, iconName, callback)
 
 	local label = Instance.new("TextLabel")
 	label.Size = UDim2.new(1, -(16 + iconOffset), 1, 0)
-	label.Position = UDim2.new(0, 16 + iconOffset, 0, 0)
+	label.Position = UDim2.new(0, 12 + iconOffset, 0, 0)
 	label.Text = text
-	label.TextColor3 = THEME.Accent
-	label.TextSize = 16
+	label.TextColor3 = THEME.Text
+	label.TextSize = 13
 	label.Font = Enum.Font.GothamMedium
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.BackgroundTransparency = 1
@@ -448,7 +448,7 @@ function AtheriumGUI:AddButton(text, iconName, callback)
 	end)
 end
 
--- iOS Toggle Switch
+-- Compact B/W Toggle
 function AtheriumGUI:AddToggle(text, iconName, defaultState, callback)
 	if type(iconName) == "boolean" then
 		callback = defaultState
@@ -458,11 +458,11 @@ function AtheriumGUI:AddToggle(text, iconName, defaultState, callback)
 
 	local state = defaultState or false
 	local toggleFrame = Instance.new("Frame")
-	toggleFrame.Size = UDim2.new(1, 0, 0, 50)
+	toggleFrame.Size = UDim2.new(1, 0, 0, 38)
 	toggleFrame.BackgroundColor3 = THEME.Card
 	toggleFrame.BackgroundTransparency = self.GlobalTransparency
 	toggleFrame.Parent = self.Container
-	addCorner(toggleFrame, 14)
+	addCorner(toggleFrame, 10)
 	addStroke(toggleFrame, THEME.Border, 0)
 
 	table.insert(self.ElementsToTransparency, {Instance = toggleFrame, BaseTransparency = 0})
@@ -470,31 +470,31 @@ function AtheriumGUI:AddToggle(text, iconName, defaultState, callback)
 	local iconOffset = createIcon(toggleFrame, iconName)
 
 	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(1, -(75 + iconOffset), 1, 0)
-	label.Position = UDim2.new(0, 16 + iconOffset, 0, 0)
+	label.Size = UDim2.new(1, -(60 + iconOffset), 1, 0)
+	label.Position = UDim2.new(0, 12 + iconOffset, 0, 0)
 	label.Text = text
 	label.TextColor3 = THEME.Text
-	label.TextSize = 15
+	label.TextSize = 13
 	label.Font = Enum.Font.GothamMedium
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.BackgroundTransparency = 1
 	label.Parent = toggleFrame
 
 	local switchBG = Instance.new("Frame")
-	switchBG.Size = UDim2.new(0, 51, 0, 31)
-	switchBG.Position = UDim2.new(1, -63, 0.5, -15)
-	switchBG.BackgroundColor3 = state and THEME.Success or Color3.fromRGB(229, 229, 234)
+	switchBG.Size = UDim2.new(0, 36, 0, 20)
+	switchBG.Position = UDim2.new(1, -48, 0.5, -10)
+	switchBG.BackgroundColor3 = state and THEME.Accent or Color3.fromRGB(48, 48, 54)
 	switchBG.BorderSizePixel = 0
 	switchBG.Parent = toggleFrame
-	addCorner(switchBG, 16)
+	addCorner(switchBG, 10)
 
 	local circle = Instance.new("Frame")
-	circle.Size = UDim2.new(0, 27, 0, 27)
-	circle.Position = state and UDim2.new(1, -29, 0.5, -13) or UDim2.new(0, 2, 0.5, -13)
-	circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	circle.Size = UDim2.new(0, 14, 0, 14)
+	circle.Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7)
+	circle.BackgroundColor3 = state and Color3.fromRGB(10, 10, 12) or Color3.fromRGB(245, 245, 247)
 	circle.BorderSizePixel = 0
 	circle.Parent = switchBG
-	addCorner(circle, 14)
+	addCorner(circle, 7)
 
 	local clickBtn = Instance.new("TextButton")
 	clickBtn.Size = UDim2.new(1, 0, 1, 0)
@@ -504,8 +504,8 @@ function AtheriumGUI:AddToggle(text, iconName, defaultState, callback)
 
 	clickBtn.MouseButton1Click:Connect(function()
 		state = not state
-		TweenService:Create(switchBG, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundColor3 = state and THEME.Success or Color3.fromRGB(229, 229, 234)}):Play()
-		TweenService:Create(circle, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = state and UDim2.new(1, -29, 0.5, -13) or UDim2.new(0, 2, 0.5, -13)}):Play()
+		TweenService:Create(switchBG, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundColor3 = state and THEME.Accent or Color3.fromRGB(48, 48, 54)}):Play()
+		TweenService:Create(circle, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7), BackgroundColor3 = state and Color3.fromRGB(10, 10, 12) or Color3.fromRGB(245, 245, 247)}):Play()
 		if callback then callback(state) end
 	end)
 end
@@ -601,7 +601,7 @@ function AtheriumGUI:AddSlider(text, iconName, minVal, maxVal, defaultVal, callb
 	end)
 end
 
--- WindUI Interactive ColorPicker
+-- B/W ColorPicker: SV square + Hue (no dead assets)
 function AtheriumGUI:AddColorPicker(text, iconName, defaultColor, callback)
 	if typeof(iconName) == "Color3" then
 		callback = defaultColor
@@ -609,9 +609,17 @@ function AtheriumGUI:AddColorPicker(text, iconName, defaultColor, callback)
 		iconName = nil
 	end
 
-	defaultColor = defaultColor or Color3.fromRGB(0, 162, 255)
+	defaultColor = defaultColor or Color3.fromRGB(255, 255, 255)
+	local h, s, v = defaultColor:ToHSV()
 	local currentColor = defaultColor
 	local expanded = false
+
+	local function toHex(c)
+		return string.format("#%02X%02X%02X",
+			math.floor(c.R * 255 + 0.5),
+			math.floor(c.G * 255 + 0.5),
+			math.floor(c.B * 255 + 0.5))
+	end
 
 	local colorFrame = Instance.new("Frame")
 	colorFrame.Size = UDim2.new(1, 0, 0, 38)
@@ -619,19 +627,19 @@ function AtheriumGUI:AddColorPicker(text, iconName, defaultColor, callback)
 	colorFrame.BackgroundTransparency = self.GlobalTransparency
 	colorFrame.ClipsDescendants = true
 	colorFrame.Parent = self.Container
-	addCorner(colorFrame, 8)
-	addStroke(colorFrame, THEME.Border, 0.6)
+	addCorner(colorFrame, 10)
+	addStroke(colorFrame, THEME.Border, 0)
 
 	table.insert(self.ElementsToTransparency, {Instance = colorFrame, BaseTransparency = 0})
 
 	local iconOffset = createIcon(colorFrame, iconName)
 
 	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(0.6, -iconOffset, 0, 38)
+	label.Size = UDim2.new(1, -(70 + iconOffset), 0, 38)
 	label.Position = UDim2.new(0, 12 + iconOffset, 0, 0)
 	label.Text = text
 	label.TextColor3 = THEME.Text
-	label.TextSize = 12
+	label.TextSize = 13
 	label.Font = Enum.Font.GothamMedium
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.BackgroundTransparency = 1
@@ -639,52 +647,153 @@ function AtheriumGUI:AddColorPicker(text, iconName, defaultColor, callback)
 
 	-- Color Preview Indicator
 	local preview = Instance.new("Frame")
-	preview.Size = UDim2.new(0, 26, 0, 18)
-	preview.Position = UDim2.new(1, -38, 0, 10)
+	preview.Size = UDim2.new(0, 40, 0, 20)
+	preview.Position = UDim2.new(1, -52, 0.5, -10)
 	preview.BackgroundColor3 = currentColor
+	preview.BorderSizePixel = 0
 	preview.Parent = colorFrame
-	addCorner(preview, 4)
-	addStroke(preview, THEME.Border, 0.4)
+	addCorner(preview, 6)
+	addStroke(preview, THEME.Border, 0)
 
-	-- Color Palette Container
-	local paletteContainer = Instance.new("Frame")
-	paletteContainer.Size = UDim2.new(1, -24, 0, 100)
-	paletteContainer.Position = UDim2.new(0, 12, 0, 42)
-	paletteContainer.BackgroundTransparency = 1
-	paletteContainer.Parent = colorFrame
+	-- Palette
+	local palette = Instance.new("Frame")
+	palette.Size = UDim2.new(1, -24, 0, 160)
+	palette.Position = UDim2.new(0, 12, 0, 44)
+	palette.BackgroundTransparency = 1
+	palette.Parent = colorFrame
 
-	-- Hue Slider
-	local hueTrack = Instance.new("ImageLabel")
-	hueTrack.Size = UDim2.new(1, 0, 0, 14)
-	hueTrack.Position = UDim2.new(0, 0, 0, 75)
-	hueTrack.Image = "rbxassetid://2849427770" -- Rainbow Gradient Spectrum
-	hueTrack.Parent = paletteContainer
-	addCorner(hueTrack, 4)
+	-- SV square
+	local svBox = Instance.new("Frame")
+	svBox.Size = UDim2.new(1, 0, 0, 110)
+	svBox.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+	svBox.BorderSizePixel = 0
+	svBox.Parent = palette
+	addCorner(svBox, 6)
 
-	local isSlidingHue = false
-	local function updateHue(input)
-		local percent = math.clamp((input.Position.X - hueTrack.AbsolutePosition.X) / hueTrack.AbsoluteSize.X, 0, 1)
-		currentColor = Color3.fromHSV(percent, 1, 1)
+	local satGrad = Instance.new("UIGradient")
+	satGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+	})
+	satGrad.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	satGrad.Rotation = 0
+	satGrad.Parent = svBox
+
+	local valOverlay = Instance.new("Frame")
+	valOverlay.Size = UDim2.new(1, 0, 1, 0)
+	valOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	valOverlay.BorderSizePixel = 0
+	valOverlay.Parent = svBox
+	addCorner(valOverlay, 6)
+
+	local valGrad = Instance.new("UIGradient")
+	valGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+	})
+	valGrad.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(1, 0),
+	})
+	valGrad.Rotation = 90
+	valGrad.Parent = valOverlay
+
+	local svCursor = Instance.new("Frame")
+	svCursor.Size = UDim2.new(0, 12, 0, 12)
+	svCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+	svCursor.BackgroundTransparency = 1
+	svCursor.Parent = svBox
+	addCorner(svCursor, 6)
+	addStroke(svCursor, Color3.fromRGB(255, 255, 255), 0).Thickness = 2
+
+	-- Hue bar (UIGradient rainbow, no asset id)
+	local hueTrack = Instance.new("Frame")
+	hueTrack.Size = UDim2.new(1, 0, 0, 12)
+	hueTrack.Position = UDim2.new(0, 0, 0, 118)
+	hueTrack.BorderSizePixel = 0
+	hueTrack.Parent = palette
+	addCorner(hueTrack, 6)
+
+	local hueGrad = Instance.new("UIGradient")
+	hueGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+		ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+		ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+		ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+		ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+		ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+		ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
+	})
+	hueGrad.Parent = hueTrack
+
+	local hueCursor = Instance.new("Frame")
+	hueCursor.Size = UDim2.new(0, 4, 1, 0)
+	hueCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	hueCursor.BorderSizePixel = 0
+	hueCursor.Parent = hueTrack
+	addCorner(hueCursor, 2)
+
+	local hexLabel = Instance.new("TextLabel")
+	hexLabel.Size = UDim2.new(1, 0, 0, 16)
+	hexLabel.Position = UDim2.new(0, 0, 0, 134)
+	hexLabel.Text = toHex(currentColor)
+	hexLabel.TextColor3 = THEME.SubText
+	hexLabel.TextSize = 11
+	hexLabel.Font = Enum.Font.Code
+	hexLabel.TextXAlignment = Enum.TextXAlignment.Left
+	hexLabel.BackgroundTransparency = 1
+	hexLabel.Parent = palette
+
+	local function refresh()
+		currentColor = Color3.fromHSV(h, s, v)
 		preview.BackgroundColor3 = currentColor
+		svBox.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+		hexLabel.Text = toHex(currentColor)
+		svCursor.Position = UDim2.new(s, 0, 1 - v, 0)
+		hueCursor.Position = UDim2.new(h, -2, 0, 0)
 		if callback then callback(currentColor) end
 	end
 
+	local slidingSV, slidingHue = false, false
+	local function updateSV(input)
+		local relX = math.clamp((input.Position.X - svBox.AbsolutePosition.X) / math.max(svBox.AbsoluteSize.X, 1), 0, 1)
+		local relY = math.clamp((input.Position.Y - svBox.AbsolutePosition.Y) / math.max(svBox.AbsoluteSize.Y, 1), 0, 1)
+		s, v = relX, 1 - relY
+		refresh()
+	end
+	local function updateHue(input)
+		h = math.clamp((input.Position.X - hueTrack.AbsolutePosition.X) / math.max(hueTrack.AbsoluteSize.X, 1), 0, 1)
+		refresh()
+	end
+
+	svBox.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			slidingSV = true
+			updateSV(input)
+		end
+	end)
 	hueTrack.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			isSlidingHue = true
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			slidingHue = true
 			updateHue(input)
 		end
 	end)
-
 	UserInputService.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then isSlidingHue = false end
-	end)
-
-	UserInputService.InputChanged:Connect(function(input)
-		if isSlidingHue and input.UserInputType == Enum.UserInputType.MouseMovement then
-			updateHue(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			slidingSV, slidingHue = false, false
 		end
 	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			if slidingSV then updateSV(input) end
+			if slidingHue then updateHue(input) end
+		end
+	end)
+
+	refresh()
 
 	local toggleBtn = Instance.new("TextButton")
 	toggleBtn.Size = UDim2.new(1, 0, 0, 38)
@@ -694,7 +803,7 @@ function AtheriumGUI:AddColorPicker(text, iconName, defaultColor, callback)
 
 	toggleBtn.MouseButton1Click:Connect(function()
 		expanded = not expanded
-		TweenService:Create(colorFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {Size = UDim2.new(1, 0, 0, expanded and 140 or 38)}):Play()
+		TweenService:Create(colorFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, expanded and 212 or 38)}):Play()
 	end)
 end
 
