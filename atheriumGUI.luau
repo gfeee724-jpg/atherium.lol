@@ -52,34 +52,59 @@ local function addStroke(parent, color, transparency)
 end
 
 local function createIcon(parent, iconName, customSize, customPos)
-	if not iconName or type(iconName) ~= "string" or not Icons then return 0 end
+	if not iconName or type(iconName) ~= "string" or iconName == "" then return 0 end
+	if not Icons then
+		pcall(function()
+			Icons = loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Footagesus/Icons/main/Main-v2.lua"))()
+			if Icons and Icons.SetIconsType then
+				pcall(function() Icons.SetIconsType("lucide") end)
+			end
+		end)
+	end
+	if not Icons then return 0 end
 
 	local iconImage = nil
 	pcall(function()
 		if typeof(Icons.GetIcon) == "function" then
 			iconImage = Icons.GetIcon(iconName)
-		elseif typeof(Icons.CreateIcon) == "function" then
+		end
+		if not iconImage and typeof(Icons.getIcon) == "function" then
+			iconImage = Icons.getIcon(iconName)
+		end
+		if not iconImage and typeof(Icons.CreateIcon) == "function" then
 			iconImage = Icons.CreateIcon(iconName)
+		end
+		if not iconImage and type(Icons[iconName]) ~= "nil" then
+			iconImage = Icons[iconName]
 		end
 	end)
 
 	if iconImage then
+		local img, rectOffset, rectSize = "", Vector2.new(0, 0), Vector2.new(0, 0)
+		if typeof(iconImage) == "table" then
+			img = iconImage.Image or iconImage.Texture or iconImage.id or ""
+			rectOffset = iconImage.ImageRectOffset or iconImage.RectOffset or Vector2.new(0, 0)
+			rectSize = iconImage.ImageRectSize or iconImage.RectSize or Vector2.new(0, 0)
+		elseif typeof(iconImage) == "string" then
+			img = iconImage
+		end
+		if img == "" then return 0 end
+
 		local iconLabel = Instance.new("ImageLabel")
 		iconLabel.Name = "Icon"
 		iconLabel.Size = customSize or UDim2.new(0, 16, 0, 16)
 		iconLabel.Position = customPos or UDim2.new(0, 12, 0.5, -8)
 		iconLabel.BackgroundTransparency = 1
-		
-		if typeof(iconImage) == "table" then
-			iconLabel.Image = iconImage.Image or iconImage.Texture or ""
-			iconLabel.ImageRectOffset = iconImage.ImageRectOffset or Vector2.new(0, 0)
-			iconLabel.ImageRectSize = iconImage.ImageRectSize or Vector2.new(0, 0)
-		elseif typeof(iconImage) == "string" then
-			iconLabel.Image = iconImage
+		iconLabel.Image = img
+		-- only apply spritesheet rect when it is actually set
+		if rectSize.X > 0 and rectSize.Y > 0 then
+			iconLabel.ImageRectOffset = rectOffset
+			iconLabel.ImageRectSize = rectSize
 		end
+		iconLabel.ScaleType = Enum.ScaleType.Fit
 
 		iconLabel.ImageColor3 = THEME.Text
-		iconLabel.ImageTransparency = 0.15
+		iconLabel.ImageTransparency = 0
 		iconLabel.ZIndex = 3
 		iconLabel.Parent = parent
 		return 26
@@ -96,7 +121,21 @@ function AtheriumGUI.CreateWindow(titleText)
 	local screenGui = Instance.new("ScreenGui")
 	screenGui.Name = "Atherium_iOS"
 	screenGui.ResetOnSpawn = false
+	screenGui.IgnoreGuiInset = true
+	screenGui.DisplayOrder = 999
 	screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+	-- DPI / GUI scale (user adjustable in settings)
+	local uiScale = Instance.new("UIScale")
+	uiScale.Scale = 1.15
+	uiScale.Parent = screenGui
+	self.UIScale = uiScale
+	self.DPI = 1.15
+	function self:SetDPI(scale)
+		scale = math.clamp(scale or 1.15, 0.75, 1.5)
+		self.DPI = scale
+		uiScale.Scale = scale
+	end
 
 	-- Notification Container
 	local notifHolder = Instance.new("Frame")
@@ -115,8 +154,8 @@ function AtheriumGUI.CreateWindow(titleText)
 	-- Main Window Frame (B/W sheet)
 	local mainFrame = Instance.new("Frame")
 	mainFrame.Name = "MainFrame"
-	mainFrame.Size = UDim2.new(0, 480, 0, 380)
-	mainFrame.Position = UDim2.new(0.5, -240, 0.5, -190)
+	mainFrame.Size = UDim2.new(0, 520, 0, 400)
+	mainFrame.Position = UDim2.new(0.5, -260, 0.5, -200)
 	mainFrame.BackgroundColor3 = THEME.Background
 	mainFrame.BackgroundTransparency = self.GlobalTransparency
 	mainFrame.BorderSizePixel = 0
@@ -176,16 +215,16 @@ function AtheriumGUI.CreateWindow(titleText)
 	settingsBtn.ImageColor3 = THEME.SubText
 	settingsBtn.Parent = header
 
-	-- Settings Dropdown Frame (Opacity Slider)
+	-- Settings Dropdown Frame (Opacity + DPI sliders)
 	local opacityFrame = Instance.new("Frame")
-	opacityFrame.Size = UDim2.new(0, 200, 0, 45)
-	opacityFrame.Position = UDim2.new(1, -210, 1, 5)
+	opacityFrame.Size = UDim2.new(0, 220, 0, 96)
+	opacityFrame.Position = UDim2.new(1, -230, 1, 5)
 	opacityFrame.BackgroundColor3 = THEME.Card
 	opacityFrame.Visible = false
 	opacityFrame.ZIndex = 10
 	opacityFrame.Parent = header
 	addCorner(opacityFrame, 8)
-	addStroke(opacityFrame, THEME.Accent, 0.4)
+	addStroke(opacityFrame, THEME.Border, 0)
 
 	local opLabel = Instance.new("TextLabel")
 	opLabel.Size = UDim2.new(1, -12, 0, 18)
@@ -201,9 +240,10 @@ function AtheriumGUI.CreateWindow(titleText)
 
 	local opTrack = Instance.new("Frame")
 	opTrack.Size = UDim2.new(1, -16, 0, 4)
-	opTrack.Position = UDim2.new(0, 8, 1, -12)
-	opTrack.BackgroundColor3 = THEME.Header
+	opTrack.Position = UDim2.new(0, 8, 0, 26)
+	opTrack.BackgroundColor3 = Color3.fromRGB(48, 48, 54)
 	opTrack.ZIndex = 11
+	opTrack.BorderSizePixel = 0
 	opTrack.Parent = opacityFrame
 	addCorner(opTrack, 2)
 
@@ -211,8 +251,51 @@ function AtheriumGUI.CreateWindow(titleText)
 	opFill.Size = UDim2.new(1 - self.GlobalTransparency, 0, 1, 0)
 	opFill.BackgroundColor3 = THEME.Accent
 	opFill.ZIndex = 11
+	opFill.BorderSizePixel = 0
 	opFill.Parent = opTrack
 	addCorner(opFill, 2)
+
+	-- DPI row
+	local dpiLabel = Instance.new("TextLabel")
+	dpiLabel.Size = UDim2.new(1, -60, 0, 18)
+	dpiLabel.Position = UDim2.new(0, 8, 0, 44)
+	dpiLabel.Text = "Масштаб GUI"
+	dpiLabel.TextColor3 = THEME.Text
+	dpiLabel.TextSize = 11
+	dpiLabel.Font = Enum.Font.GothamMedium
+	dpiLabel.TextXAlignment = Enum.TextXAlignment.Left
+	dpiLabel.BackgroundTransparency = 1
+	dpiLabel.ZIndex = 11
+	dpiLabel.Parent = opacityFrame
+
+	local dpiValue = Instance.new("TextLabel")
+	dpiValue.Size = UDim2.new(0, 48, 0, 18)
+	dpiValue.Position = UDim2.new(1, -56, 0, 44)
+	dpiValue.Text = "115%"
+	dpiValue.TextColor3 = THEME.SubText
+	dpiValue.TextSize = 11
+	dpiValue.Font = Enum.Font.Code
+	dpiValue.TextXAlignment = Enum.TextXAlignment.Right
+	dpiValue.BackgroundTransparency = 1
+	dpiValue.ZIndex = 11
+	dpiValue.Parent = opacityFrame
+
+	local dpiTrack = Instance.new("Frame")
+	dpiTrack.Size = UDim2.new(1, -16, 0, 4)
+	dpiTrack.Position = UDim2.new(0, 8, 0, 68)
+	dpiTrack.BackgroundColor3 = Color3.fromRGB(48, 48, 54)
+	dpiTrack.ZIndex = 11
+	dpiTrack.BorderSizePixel = 0
+	dpiTrack.Parent = opacityFrame
+	addCorner(dpiTrack, 2)
+
+	local dpiFill = Instance.new("Frame")
+	dpiFill.Size = UDim2.new((1.15 - 0.75) / (1.5 - 0.75), 0, 1, 0)
+	dpiFill.BackgroundColor3 = THEME.Accent
+	dpiFill.ZIndex = 11
+	dpiFill.BorderSizePixel = 0
+	dpiFill.Parent = dpiTrack
+	addCorner(dpiFill, 2)
 
 	local isSlidingOp = false
 	local function updateOpacity(input)
@@ -245,6 +328,34 @@ function AtheriumGUI.CreateWindow(titleText)
 	UserInputService.InputChanged:Connect(function(input)
 		if isSlidingOp and input.UserInputType == Enum.UserInputType.MouseMovement then
 			updateOpacity(input)
+		end
+	end)
+
+	local isSlidingDPI = false
+	local function updateDPI(input)
+		local percent = math.clamp((input.Position.X - dpiTrack.AbsolutePosition.X) / math.max(dpiTrack.AbsoluteSize.X, 1), 0, 1)
+		dpiFill.Size = UDim2.new(percent, 0, 1, 0)
+		local scale = 0.75 + percent * (1.5 - 0.75)
+		self:SetDPI(scale)
+		dpiValue.Text = math.floor(scale * 100 + 0.5) .. "%"
+	end
+
+	dpiTrack.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			isSlidingDPI = true
+			updateDPI(input)
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			isSlidingDPI = false
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if isSlidingDPI and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			updateDPI(input)
 		end
 	end)
 
@@ -662,38 +773,38 @@ function AtheriumGUI:AddColorPicker(text, iconName, defaultColor, callback)
 	palette.BackgroundTransparency = 1
 	palette.Parent = colorFrame
 
-	-- SV square
+	-- SV square: hue base + white sat overlay + black val overlay
 	local svBox = Instance.new("Frame")
 	svBox.Size = UDim2.new(1, 0, 0, 110)
 	svBox.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
 	svBox.BorderSizePixel = 0
+	svBox.ClipsDescendants = true
 	svBox.Parent = palette
 	addCorner(svBox, 6)
 
+	-- saturation: white opaque left (s=0 -> white) to transparent right (s=1 -> pure hue)
+	local satOverlay = Instance.new("Frame")
+	satOverlay.Size = UDim2.new(1, 0, 1, 0)
+	satOverlay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	satOverlay.BorderSizePixel = 0
+	satOverlay.Parent = svBox
+
 	local satGrad = Instance.new("UIGradient")
-	satGrad.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
-	})
 	satGrad.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 0),
 		NumberSequenceKeypoint.new(1, 1),
 	})
 	satGrad.Rotation = 0
-	satGrad.Parent = svBox
+	satGrad.Parent = satOverlay
 
+	-- value: transparent top (v=1 bright) to black opaque bottom (v=0 dark)
 	local valOverlay = Instance.new("Frame")
 	valOverlay.Size = UDim2.new(1, 0, 1, 0)
 	valOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	valOverlay.BorderSizePixel = 0
 	valOverlay.Parent = svBox
-	addCorner(valOverlay, 6)
 
 	local valGrad = Instance.new("UIGradient")
-	valGrad.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
-	})
 	valGrad.Transparency = NumberSequence.new({
 		NumberSequenceKeypoint.new(0, 1),
 		NumberSequenceKeypoint.new(1, 0),
@@ -702,12 +813,14 @@ function AtheriumGUI:AddColorPicker(text, iconName, defaultColor, callback)
 	valGrad.Parent = valOverlay
 
 	local svCursor = Instance.new("Frame")
-	svCursor.Size = UDim2.new(0, 12, 0, 12)
+	svCursor.Size = UDim2.new(0, 10, 0, 10)
 	svCursor.AnchorPoint = Vector2.new(0.5, 0.5)
-	svCursor.BackgroundTransparency = 1
+	svCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	svCursor.BorderSizePixel = 0
 	svCursor.Parent = svBox
-	addCorner(svCursor, 6)
-	addStroke(svCursor, Color3.fromRGB(255, 255, 255), 0).Thickness = 2
+	addCorner(svCursor, 5)
+	local svRing = addStroke(svCursor, Color3.fromRGB(0, 0, 0), 0)
+	svRing.Thickness = 2
 
 	-- Hue bar (UIGradient rainbow, no asset id)
 	local hueTrack = Instance.new("Frame")
