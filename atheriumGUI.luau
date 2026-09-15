@@ -15,23 +15,23 @@ pcall(function()
 	end
 end)
 
--- Fluent / WindUI Premium Dark Theme
+-- iOS 17 grouped / frosted Theme (Light)
 local THEME = {
-	Background = Color3.fromRGB(15, 15, 20),
-	Header = Color3.fromRGB(22, 22, 30),
-	Card = Color3.fromRGB(25, 25, 35),
-	CardHover = Color3.fromRGB(35, 35, 48),
-	
-	-- Modern WindUI Palette
-	Accent = Color3.fromRGB(0, 162, 255),       -- Vibrant Fluent Blue
-	Success = Color3.fromRGB(46, 204, 113),     -- Mint Green
-	Warning = Color3.fromRGB(241, 196, 15),     -- Amber
-	Error = Color3.fromRGB(231, 76, 60),        -- Coral Red
-	
-	Text = Color3.fromRGB(240, 240, 245),
-	SubText = Color3.fromRGB(140, 140, 160),
-	Border = Color3.fromRGB(45, 45, 60),
-	BorderFocus = Color3.fromRGB(0, 162, 255),
+	Background = Color3.fromRGB(242, 242, 247),
+	Header = Color3.fromRGB(255, 255, 255),
+	Card = Color3.fromRGB(255, 255, 255),
+	CardHover = Color3.fromRGB(229, 229, 234),
+
+	-- iOS system palette
+	Accent = Color3.fromRGB(0, 122, 255),        -- iOS Blue
+	Success = Color3.fromRGB(52, 199, 89),       -- iOS Green
+	Warning = Color3.fromRGB(255, 149, 0),       -- iOS Orange
+	Error = Color3.fromRGB(255, 59, 48),         -- iOS Red
+
+	Text = Color3.fromRGB(0, 0, 0),
+	SubText = Color3.fromRGB(142, 142, 147),
+	Border = Color3.fromRGB(229, 229, 234),
+	BorderFocus = Color3.fromRGB(0, 122, 255),
 }
 
 local function addCorner(parent, radius)
@@ -90,11 +90,11 @@ end
 
 function AtheriumGUI.CreateWindow(titleText)
 	local self = setmetatable({}, AtheriumGUI)
-	self.GlobalTransparency = 0.15
+	self.GlobalTransparency = 0
 	self.ElementsToTransparency = {}
 
 	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = "Atherium_WindUI"
+	screenGui.Name = "Atherium_iOS"
 	screenGui.ResetOnSpawn = false
 	screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
@@ -112,37 +112,56 @@ function AtheriumGUI.CreateWindow(titleText)
 	notifLayout.Padding = UDim.new(0, 8)
 	notifLayout.Parent = notifHolder
 
-	-- Main Window Frame
+	-- Main Window Frame (iOS sheet)
 	local mainFrame = Instance.new("Frame")
 	mainFrame.Name = "MainFrame"
-	mainFrame.Size = UDim2.new(0, 520, 0, 400)
-	mainFrame.Position = UDim2.new(0.5, -260, 0.5, -200)
+	mainFrame.Size = UDim2.new(0, 520, 0, 420)
+	mainFrame.Position = UDim2.new(0.5, -260, 0.5, -210)
 	mainFrame.BackgroundColor3 = THEME.Background
 	mainFrame.BackgroundTransparency = self.GlobalTransparency
 	mainFrame.BorderSizePixel = 0
 	mainFrame.ClipsDescendants = true
 	mainFrame.Parent = screenGui
-	addCorner(mainFrame, 10)
-	local mainStroke = addStroke(mainFrame, THEME.Border, 0.2)
+	addCorner(mainFrame, 20)
+	local mainStroke = addStroke(mainFrame, THEME.Border, 0)
 
-	table.insert(self.ElementsToTransparency, {Instance = mainFrame, BaseTransparency = 0.15})
+	table.insert(self.ElementsToTransparency, {Instance = mainFrame, BaseTransparency = 0})
 
-	-- Window Header (Fluent Style)
+	-- Window Header (iOS nav bar, only top rounded)
 	local header = Instance.new("Frame")
 	header.Name = "Header"
-	header.Size = UDim2.new(1, 0, 0, 42)
+	header.Size = UDim2.new(1, 0, 0, 52)
 	header.BackgroundColor3 = THEME.Header
 	header.BackgroundTransparency = self.GlobalTransparency
 	header.BorderSizePixel = 0
 	header.Parent = mainFrame
-	addCorner(header, 10)
+	addCorner(header, 20)
+
+	-- cover bottom rounding so only top is rounded
+	local headerFix = Instance.new("Frame")
+	headerFix.Name = "HeaderFix"
+	headerFix.Size = UDim2.new(1, 0, 0, 20)
+	headerFix.Position = UDim2.new(0, 0, 1, -20)
+	headerFix.BackgroundColor3 = THEME.Header
+	headerFix.BackgroundTransparency = self.GlobalTransparency
+	headerFix.BorderSizePixel = 0
+	headerFix.Parent = header
+
+	-- iOS separator line under header
+	local headerLine = Instance.new("Frame")
+	headerLine.Name = "Separator"
+	headerLine.Size = UDim2.new(1, 0, 0, 1)
+	headerLine.Position = UDim2.new(0, 0, 1, -1)
+	headerLine.BackgroundColor3 = THEME.Border
+	headerLine.BorderSizePixel = 0
+	headerLine.Parent = header
 
 	local title = Instance.new("TextLabel")
 	title.Size = UDim2.new(1, -120, 1, 0)
-	title.Position = UDim2.new(0, 16, 0, 0)
-	title.Text = titleText or "Atherium WindUI"
+	title.Position = UDim2.new(0, 20, 0, 0)
+	title.Text = titleText or "Atherium"
 	title.TextColor3 = THEME.Text
-	title.TextSize = 14
+	title.TextSize = 17
 	title.Font = Enum.Font.GothamBold
 	title.TextXAlignment = Enum.TextXAlignment.Left
 	title.BackgroundTransparency = 1
@@ -246,8 +265,8 @@ function AtheriumGUI.CreateWindow(titleText)
 
 	local container = Instance.new("ScrollingFrame")
 	container.Name = "Container"
-	container.Size = UDim2.new(1, -20, 1, -52)
-	container.Position = UDim2.new(0, 10, 0, 48)
+	container.Size = UDim2.new(1, -24, 1, -64)
+	container.Position = UDim2.new(0, 12, 0, 58)
 	container.BackgroundTransparency = 1
 	container.BorderSizePixel = 0
 	container.ScrollBarThickness = 2
@@ -367,26 +386,26 @@ function AtheriumGUI:Notify(titleText, descText, duration, notifType)
 	end)
 end
 
--- Section Divider
+-- Section Divider (iOS grouped header)
 function AtheriumGUI:AddSection(text)
 	local sectionFrame = Instance.new("Frame")
-	sectionFrame.Size = UDim2.new(1, 0, 0, 22)
+	sectionFrame.Size = UDim2.new(1, 0, 0, 28)
 	sectionFrame.BackgroundTransparency = 1
 	sectionFrame.Parent = self.Container
 
 	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.Position = UDim2.new(0, 4, 0, 2)
+	label.Size = UDim2.new(1, -8, 1, 0)
+	label.Position = UDim2.new(0, 20, 0, 4)
 	label.Text = string.upper(text)
-	label.TextColor3 = THEME.Accent
-	label.TextSize = 10
-	label.Font = Enum.Font.GothamBold
+	label.TextColor3 = THEME.SubText
+	label.TextSize = 13
+	label.Font = Enum.Font.GothamMedium
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.BackgroundTransparency = 1
 	label.Parent = sectionFrame
 end
 
--- Fluent Button
+-- iOS grouped cell Button
 function AtheriumGUI:AddButton(text, iconName, callback)
 	if type(iconName) == "function" then
 		callback = iconName
@@ -394,25 +413,25 @@ function AtheriumGUI:AddButton(text, iconName, callback)
 	end
 
 	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(1, 0, 0, 36)
+	button.Size = UDim2.new(1, 0, 0, 46)
 	button.BackgroundColor3 = THEME.Card
 	button.BackgroundTransparency = self.GlobalTransparency
 	button.Text = ""
 	button.AutoButtonColor = false
 	button.Parent = self.Container
-	addCorner(button, 8)
-	local stroke = addStroke(button, THEME.Border, 0.6)
+	addCorner(button, 14)
+	local stroke = addStroke(button, THEME.Border, 0)
 
 	table.insert(self.ElementsToTransparency, {Instance = button, BaseTransparency = 0})
 
 	local iconOffset = createIcon(button, iconName)
 
 	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(1, -(14 + iconOffset), 1, 0)
-	label.Position = UDim2.new(0, 12 + iconOffset, 0, 0)
+	label.Size = UDim2.new(1, -(16 + iconOffset), 1, 0)
+	label.Position = UDim2.new(0, 16 + iconOffset, 0, 0)
 	label.Text = text
-	label.TextColor3 = THEME.Text
-	label.TextSize = 12
+	label.TextColor3 = THEME.Accent
+	label.TextSize = 16
 	label.Font = Enum.Font.GothamMedium
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.BackgroundTransparency = 1
@@ -420,18 +439,16 @@ function AtheriumGUI:AddButton(text, iconName, callback)
 
 	button.MouseEnter:Connect(function()
 		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = THEME.CardHover}):Play()
-		TweenService:Create(stroke, TweenInfo.new(0.2), {Color = THEME.Accent}):Play()
 	end)
 	button.MouseLeave:Connect(function()
 		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = THEME.Card}):Play()
-		TweenService:Create(stroke, TweenInfo.new(0.2), {Color = THEME.Border}):Play()
 	end)
 	button.MouseButton1Click:Connect(function()
 		if callback then callback() end
 	end)
 end
 
--- Fluent Toggle Switch
+-- iOS Toggle Switch
 function AtheriumGUI:AddToggle(text, iconName, defaultState, callback)
 	if type(iconName) == "boolean" then
 		callback = defaultState
@@ -441,41 +458,43 @@ function AtheriumGUI:AddToggle(text, iconName, defaultState, callback)
 
 	local state = defaultState or false
 	local toggleFrame = Instance.new("Frame")
-	toggleFrame.Size = UDim2.new(1, 0, 0, 38)
+	toggleFrame.Size = UDim2.new(1, 0, 0, 50)
 	toggleFrame.BackgroundColor3 = THEME.Card
 	toggleFrame.BackgroundTransparency = self.GlobalTransparency
 	toggleFrame.Parent = self.Container
-	addCorner(toggleFrame, 8)
-	addStroke(toggleFrame, THEME.Border, 0.6)
+	addCorner(toggleFrame, 14)
+	addStroke(toggleFrame, THEME.Border, 0)
 
 	table.insert(self.ElementsToTransparency, {Instance = toggleFrame, BaseTransparency = 0})
 
 	local iconOffset = createIcon(toggleFrame, iconName)
 
 	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(1, -(60 + iconOffset), 1, 0)
-	label.Position = UDim2.new(0, 12 + iconOffset, 0, 0)
+	label.Size = UDim2.new(1, -(75 + iconOffset), 1, 0)
+	label.Position = UDim2.new(0, 16 + iconOffset, 0, 0)
 	label.Text = text
 	label.TextColor3 = THEME.Text
-	label.TextSize = 12
+	label.TextSize = 15
 	label.Font = Enum.Font.GothamMedium
 	label.TextXAlignment = Enum.TextXAlignment.Left
 	label.BackgroundTransparency = 1
 	label.Parent = toggleFrame
 
 	local switchBG = Instance.new("Frame")
-	switchBG.Size = UDim2.new(0, 38, 0, 20)
-	switchBG.Position = UDim2.new(1, -48, 0.5, -10)
-	switchBG.BackgroundColor3 = state and THEME.Accent or THEME.Header
+	switchBG.Size = UDim2.new(0, 51, 0, 31)
+	switchBG.Position = UDim2.new(1, -63, 0.5, -15)
+	switchBG.BackgroundColor3 = state and THEME.Success or Color3.fromRGB(229, 229, 234)
+	switchBG.BorderSizePixel = 0
 	switchBG.Parent = toggleFrame
-	addCorner(switchBG, 10)
+	addCorner(switchBG, 16)
 
 	local circle = Instance.new("Frame")
-	circle.Size = UDim2.new(0, 14, 0, 14)
-	circle.Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7)
+	circle.Size = UDim2.new(0, 27, 0, 27)
+	circle.Position = state and UDim2.new(1, -29, 0.5, -13) or UDim2.new(0, 2, 0.5, -13)
 	circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	circle.BorderSizePixel = 0
 	circle.Parent = switchBG
-	addCorner(circle, 7)
+	addCorner(circle, 14)
 
 	local clickBtn = Instance.new("TextButton")
 	clickBtn.Size = UDim2.new(1, 0, 1, 0)
@@ -485,8 +504,8 @@ function AtheriumGUI:AddToggle(text, iconName, defaultState, callback)
 
 	clickBtn.MouseButton1Click:Connect(function()
 		state = not state
-		TweenService:Create(switchBG, TweenInfo.new(0.2), {BackgroundColor3 = state and THEME.Accent or THEME.Header}):Play()
-		TweenService:Create(circle, TweenInfo.new(0.2), {Position = state and UDim2.new(1, -17, 0.5, -7) or UDim2.new(0, 3, 0.5, -7)}):Play()
+		TweenService:Create(switchBG, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {BackgroundColor3 = state and THEME.Success or Color3.fromRGB(229, 229, 234)}):Play()
+		TweenService:Create(circle, TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = state and UDim2.new(1, -29, 0.5, -13) or UDim2.new(0, 2, 0.5, -13)}):Play()
 		if callback then callback(state) end
 	end)
 end
